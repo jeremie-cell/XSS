@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local XSS Training Lab</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background-color: #080f20;
+    background-image:
+        radial-gradient(circle, rgba(59, 131, 246, 0.432) 2px, transparent 1px),
+        radial-gradient(ellipse at top right, rgba(37, 99, 235, 0.18), transparent 45%);
+    background-size: 24px 24px, 100% 100%;
+    color: #f8fafc;
+    margin: 0;
+    padding: 40px 20px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 850px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    color: #60a5fa;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: -0.8px;
+}
+
+.description {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.warning {
+    background: rgba(249, 115, 22, 0.10);
+    color: #fdba74;
+    border: 1px solid rgba(249, 115, 22, 0.35);
+    border-left: 4px solid #f97316;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.card {
+    background: rgba(15, 23, 42, 0.70);
+    border: 1px solid #243654;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    transition: border-color 0.25s, transform 0.25s;
+}
+
+.card:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+h2 {
+    color: #e2e8f0;
+    font-size: 19px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 9px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 95px;
+    padding: 13px;
+    margin-bottom: 14px;
+    background: #080f20;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea::placeholder {
+    color: #64748b;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+button {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    border: 1px solid #3b82f6;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.25);
+    transform: translateY(-1px);
+}
+
+.safe-button {
+    background: linear-gradient(135deg, #059669, #047857);
+    border-color: #10b981;
+}
+
+.safe-button:hover {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.output {
+    background: #080f20;
+    color: #cbd5e1;
+    border: 1px solid #243654;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 16px;
+    min-height: 45px;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.output:empty {
+    display: none;
+}
+
+footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 35px;
+    letter-spacing: 0.4px;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 25px 12px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+}
+
+    </style>
+
+</head>
+<body>
+    <h1>Local XSS Training Lab</h1>
+
+  <p class="warning">
+    For classroom use only. Run this page locally and never test it against systems you do not own.
+  </p>
+
+  <section class="card">
+    <h2>Exercise A: Reflected XSS</h2>
+
+    <form id="reflectedForm">
+      <label for="reflectedInput">Enter a greeting:</label>
+      <textarea id="reflectedInput" placeholder="Type a message"></textarea>
+      <button type="submit">Display Message</button>
+    </form>
+
+    <div id="reflectedOutput" class="output"></div>
+  </section>
+
+  <section class="card">
+    <h2>Exercise B: DOM XSS</h2>
+
+    <label for="domInput">Enter a message:</label>
+    <textarea id="domInput" placeholder="Type a message"></textarea>
+    <button id="domButton">Display Message</button>
+
+    <div id="domOutput" class="output"></div>
+  </section>
+
+  <section class="card">
+    <h2>Exercise C: Safe Output</h2>
+
+    <label for="safeInput">Enter a message:</label>
+    <textarea id="safeInput" placeholder="Type a message"></textarea>
+    <button id="safeButton">Display Safely</button>
+
+    <div id="safeOutput" class="output"></div>
+  </section>
+
+  <script>
+    const reflectedForm = document.getElementById("reflectedForm");
+    const reflectedInput = document.getElementById("reflectedInput");
+    const reflectedOutput = document.getElementById("reflectedOutput");
+
+    reflectedForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const message = reflectedInput.value;
+
+      reflectedOutput.innerHTML = "You entered: " + message;
+    });
+
+    const domInput = document.getElementById("domInput");
+    const domButton = document.getElementById("domButton");
+    const domOutput = document.getElementById("domOutput");
+
+    domButton.addEventListener("click", function () {
+      const message = domInput.value;
+
+      domOutput.innerHTML = message;
+    });
+
+    const safeInput = document.getElementById("safeInput");
+    const safeButton = document.getElementById("safeButton");
+    const safeOutput = document.getElementById("safeOutput");
+
+    safeButton.addEventListener("click", function () {
+      const message = safeInput.value;
+
+      safeOutput.textContent = message;
+    });
+  </script>
+</body>
+</html>
