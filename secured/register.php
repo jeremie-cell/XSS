@@ -1,3 +1,52 @@
+<?php
+require "db.php";
+
+$message = "";
+$messageType = "message";
+
+if (isset($_POST["register"])) {
+    $email = trim($_POST["email"] ?? "");
+    $password = $_POST["password"] ?? "";
+    $confirm_password = $_POST["confirm_password"] ?? "";
+
+    if (empty($email) || empty($password) || empty($confirm_password)) {
+        $message = "All fields are required.";
+        $messageType = "error-message";
+    } elseif ($password !== $confirm_password) {
+        $message = "Passwords do not match.";
+        $messageType = "error-message";
+    } else {
+        $check = $conn->prepare("SELECT id FROM client WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $check->store_result();
+
+        if ($check->num_rows > 0) {
+            // Keep the duplicate-email message visible on the registration page.
+            $message = "Email already exists.";
+            $messageType = "error-message";
+        } else {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("INSERT INTO client (email, password) VALUES (?, ?)");
+            $stmt->bind_param("ss", $email, $hashed_password);
+
+            if ($stmt->execute()) {
+                $message = "Registration successful! You can now sign in.";
+                $messageType = "message";
+            } else {
+                $message = "Sorry, registration could not be completed. Please try again.";
+                $messageType = "error-message";
+            }
+
+            $stmt->close();
+        }
+
+        $check->close();
+    }
+}
+
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,183 +54,68 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Register</title>
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
+<style>
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: Arial;
+    background: #eee;
+    margin: 0;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px 16px;
-    color: #f8fafc;
-    background-color: #090b1a;
-    background-image: radial-gradient(
-        rgba(59, 131, 246, 0.432) 1px,
-        transparent 1px
-    );
-    background-size: 26px 26px;
+    padding: 20px;
+    box-sizing: border-box;
 }
-
-.register-card {
+.card {
     width: 100%;
-    max-width: 440px;
-    padding: 36px;
-    background: rgba(17, 27, 48, 0.70);
-    border: 1px solid #303454;
-    border-radius: 22px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    max-width: 400px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
 }
-
-.logo {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto 22px;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #3765ff, #008cff);
-    box-shadow: 0 8px 24px rgba(112, 0, 255, 0.25);
-    font-size: 26px;
-    font-weight: 800;
-    color: white;
-}
-
 h1 {
-    margin-bottom: 10px;
     text-align: center;
-    font-size: 28px;
-    font-weight: 750;
-    letter-spacing: -0.6px;
 }
-
-.subtitle {
-    margin-bottom: 30px;
-    text-align: center;
-    color: #a1a1b5;
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-.form-group {
-    margin-bottom: 21px;
-}
-
 label {
     display: block;
-    margin-bottom: 9px;
-    color: #dedeea;
-    font-size: 13px;
-    font-weight: 600;
+    margin-top: 12px;
 }
-
 input {
-    display: block;
     width: 100%;
-    height: 46px;
-    padding: 0 14px;
-    border: 1px solid #393b53;
-    border-radius: 9px;
-    outline: none;
-    background: #0c0d1d;
-    color: #ffffff;
-    font-size: 14px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
 }
-
-input::placeholder {
-    color: #77788c;
-}
-
-input:focus {
-    border-color: #008cff;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
-}
-
-button[type="submit"] {
-    display: block;
+button {
     width: 100%;
-    min-height: 46px;
-    margin-top: 7px;
-    border: 1px solid #008cff;
-    border-radius: 9px;
-    background: linear-gradient(110deg, #3765ff, #008cff);
+    margin-top: 15px;
+    padding: 10px;
+    background: #2868b2;
     color: white;
-    font-size: 14px;
-    font-weight: 700;
+    border: none;
     cursor: pointer;
-    transition: transform 0.2s, filter 0.2s;
 }
-
-button[type="submit"]:hover {
-    filter: brightness(1.15);
-    transform: translateY(-1px);
+a {
+    color: #2868b2;
 }
-
-.login-link {
-    display: block;
-    margin-top: 16px;
-    text-align: center;
-    color: #008cff;
-    font-size: 14px;
-    text-decoration: none;
+.error-message {
+    padding: 10px;
+    margin-bottom: 10px;
+    color: #a00;
+    background: #fee;
+    border: 1px solid #d99;
 }
-
-.login-link:hover {
-    color: #ffffff;
-    text-decoration: underline;
-}
-
 .message {
-    padding: 12px 14px;
-    margin-bottom: 22px;
-    border-radius: 9px;
-    font-size: 13px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: green;
+    background: #eef9f0;
+    border: 1px solid #9ac9a5;
 }
+</style>
 
-.message.success {
-    color: #a7f3d0;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(52, 211, 153, 0.35);
-}
-
-.message.error {
-    color: #fecaca;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.35);
-}
-
-.footer {
-    margin-top: 28px;
-    text-align: center;
-    color: #77788c;
-    font-size: 12px;
-}
-
-@media (max-width: 480px) {
-    body {
-        padding: 20px 14px;
-        align-items: flex-start;
-    }
-
-    .register-card {
-        padding: 28px 22px;
-        margin: auto 0;
-    }
-
-    h1 {
-        font-size: 25px;
-    }
-}
-    </style>
 
 </head>
 <body>
@@ -196,7 +130,12 @@ button[type="submit"]:hover {
     </p>
 
 
-        <form action="register.php" method="POST">
+        <?php if (!empty($message)): ?>
+        <p class="<?php echo $messageType; ?>" role="alert"><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></p>
+    <?php endif; ?>
+
+    <div class="card">
+<form action="register.php" method="POST">
 
             <div class="form-group">
                 <label for="email">Email Address</label>
@@ -206,6 +145,7 @@ button[type="submit"]:hover {
                     name="email"
                     placeholder="Enter your email"
                     autocomplete="email"
+                    value="<?php echo htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                     required
                 >
             </div>
@@ -242,51 +182,10 @@ button[type="submit"]:hover {
     </a>
 
         </form>
+</div>
 
         <p class="footer">Secure Registration Portal</p>
 </div>
 </body>
 </html>
 
-<?php
-require "db.php";
-
-if (isset($_POST["register"])) {
-
-   $email = trim($_POST["email"]);
-   $password = $_POST["password"];
-   $confirm_password = $_POST["confirm_password"];
-
-   if (empty($email) || empty($password) || empty($confirm_password)) {
-       die("All fields are required.");
-   }
-
-   if ($password !== $confirm_password) {
-       die("Passwords do not match.");
-   }
-
-   $check = $conn->prepare("SELECT id FROM client WHERE email = ?");
-   $check->bind_param("s", $email);
-   $check->execute();
-   $result = $check->get_result();
-
-   if ($result->num_rows > 0) {
-       die("Email already exists.");
-   }
-
-   $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-   $stmt = $conn->prepare("INSERT INTO client (email, password) VALUES (?, ?)");
-   $stmt->bind_param("ss", $email, $hashed_password);
-
-   if ($stmt->execute()) {
-       echo "Registration successful!";
-   } else {
-       echo "Error: " . $stmt->error;
-   }
-
-   $stmt->close();
-   $check->close();
-   $conn->close();
-}
-?>

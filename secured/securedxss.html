@@ -7,167 +7,59 @@
 
     <title>Secure XSS Training Lab</title>
 
+
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: "Inter", "Segoe UI", Arial, sans-serif;
-        background-color: #080f20;
-        background-image:
-            radial-gradient(circle, rgba(59, 131, 246, 0.432) 2px, transparent 1px),
-            radial-gradient(
-                ellipse at top right,
-                rgba(37,99,235,.18),
-                transparent 50%
-            );
-        background-size: 24px 24px, 100% 100%;
-        background-attachment: fixed;
-        color: #f8fafc;
-        margin: 0;
-        padding: 40px 20px;
-        min-height: 100vh;
-    }
-
-    h1 {
-        text-align: center;
-        color: #60a5fa;
-        font-size: 32px;
-        margin-bottom: 12px;
-    }
-
-    .warning {
-        color: #93c5fd;
-        text-align: center;
-        line-height: 1.6;
-        margin: 0 auto 30px;
-        max-width: 700px;
-    }
-
-    .container {
-        max-width: 850px;
-        margin: auto;
-    }
-
-    .card {
-        background: rgba(15,23,42,.70);
-        border: 1px solid #243654;
-        border-radius: 14px;
-        padding: 25px;
-        margin: 22px auto;
-        box-shadow: 0 8px 30px rgba(0,0,0,.2);
-        transition: border-color .25s, transform .25s;
-    }
-
-    .card:hover {
-        border-color: #3b82f6;
-        transform: translateY(-2px);
-    }
-
-    h2 {
-        color: #e2e8f0;
-        font-size: 20px;
-        margin-top: 0;
-        margin-bottom: 20px;
-    }
-
-    label {
-        display: block;
-        color: #cbd5e1;
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 9px;
-    }
-
-    textarea {
-        display: block;
-        width: 100%;
-        min-height: 90px;
-        padding: 13px;
-        margin-bottom: 14px;
-        background: #080f20;
-        color: #f8fafc;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        font: inherit;
-        resize: vertical;
-    }
-
-    textarea::placeholder {
-        color: #64748b;
-    }
-
-    textarea:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,.15);
-    }
-
-    button {
-        background: linear-gradient(135deg,#2563eb,#1d4ed8);
-        color: white;
-        border: 1px solid #3b82f6;
-        border-radius: 8px;
-        padding: 11px 18px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    button:hover {
-        background: #3b82f6;
-        box-shadow: 0 4px 18px rgba(37,99,235,.25);
-    }
-
-    .output {
-        min-height: 45px;
-        margin-top: 16px;
-        padding: 14px;
-        border: 1px solid #243654;
-        border-radius: 8px;
-        background: #080f20;
-        color: #cbd5e1;
-        overflow-wrap: anywhere;
-        white-space: pre-wrap;
-    }
-
-    .success {
-        color: #4ade80;
-        line-height: 1.6;
-    }
-
-
-    #status.warning {
-        color: #fbbf24;
-        text-align: left;
-        border-left: 3px solid #f59e0b;
-        padding: 10px 12px;
-        background: rgba(245,158,11,.08);
-    }
-
-    footer {
-        text-align: center;
-        color: #64748b;
-        font-size: 12px;
-        margin-top: 35px;
-    }
-
-    @media (max-width: 600px) {
-        body {
-            padding: 24px 12px;
-        }
-
-        h1 {
-            font-size: 26px;
-        }
-
-        .card {
-            padding: 18px;
-        }
-    }
+body {
+    font-family: Arial;
+    background: #eee;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+h1 {
+    text-align: center;
+    color: #245b91;
+}
+.card {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 15px 0;
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+textarea {
+    width: 100%;
+    height: 80px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+button {
+    padding: 8px 12px;
+    background: #2868b2;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.output {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fafafa;
+    border: 1px solid #ccc;
+    overflow-wrap: anywhere;
+}
+.warning {
+    padding: 10px;
+    background: #fff4d6;
+    border: 1px solid #e2c66d;
+}
 </style>
+
 
 </head>
 <body>
